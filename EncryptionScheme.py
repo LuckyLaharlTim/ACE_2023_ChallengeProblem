@@ -17,7 +17,7 @@ class EncryptionScheme():
     def __init__(self, user_name, cert_authority):
         self.user_name = user_name
         self.cert_authority = cert_authority
-        self.__dh_secret = pyDH.DiffieHellman(14)
+        self.__dh_secret = pyDH.DiffieHellman(15)
         self.cert_authority.add_user_dh_public(self.user_name, self.__dh_secret.gen_public_key())
         self.__cert_private_key = self.RSA_cert_gen()
 
@@ -59,7 +59,7 @@ class EncryptionScheme():
         return sharedkey.encode('utf8')
             
     def RSA_cert_gen(self):
-        privkey, pubkey = rsa.newkeys(1028) # change back to 3072
+        privkey, pubkey = rsa.newkeys(3072) # change back to 3072
         self.cert_authority.add_user_cert(self.user_name, pubkey)
         return privkey
 
