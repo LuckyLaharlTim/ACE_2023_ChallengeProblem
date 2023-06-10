@@ -15,6 +15,8 @@ from cert_authority import CertificateAuthority
 class EncryptionScheme():
 
     def __init__(self, user_name, cert_authority):
+        self.sequence_num_dict = {}
+        self.sequence_num = 0
         self.user_name = user_name
         self.cert_authority = cert_authority
         self.__dh_secret = pyDH.DiffieHellman(15)
@@ -70,8 +72,16 @@ class EncryptionScheme():
         mac = packet_hmac.hexdigest()
         return mac.encode('utf8')
 
+    def get_sequence_num(self):
+        seq_str = str(self.sequence_num)
+        while len(seq_str) < 5:
+            seq_str = "0" + seq_str
+        self.sequence_num += 1
+        return seq_str
+
     def send_message(self, message, receiver):
-        encoded_message = message.encode('utf8')
+        message_and_seq = message + self.get_sequence_num()
+        encoded_message = message_and_seq.encode('utf8')
         pub_key = self.cert_authority.dh_request_handler(receiver)
         key = self.DH(pub_key, receiver)
         cipher_text = self.encrypt_message(encoded_message, receiver)
@@ -113,8 +123,24 @@ class EncryptionScheme():
         if sig_status == False:
             print("Sender verification fail")
             return None
-        print("message safe")
-        return self.decrypt_data(message_cipher, sender)
+        message_and_seq = self.decrypt_data(message_cipher, sender)
+        print(message_and_seq)
+        if self.check_seq(sender, message_and_seq[-5:]) == False:
+            print("replay attack detected")
+            return None
+        print("message authenticated")
+        return message_and_seq[:-5]
+    
+    def check_seq(self, sender, seq_num):
+        print(seq_num)
+        int_version = int(seq_num)
+        if sender not in self.sequence_num_dict.keys():
+            self.sequence_num_dict[sender] = {int_version}
+        else:
+            if int_version in self.sequence_num_dict[sender]:
+                return False
+            self.sequence_num_dict[sender].add(int_version)
+        return True
 
 
 if __name__ == "__main__":
@@ -123,3 +149,5 @@ if __name__ == "__main__":
     test2 = EncryptionScheme("Tim", cert_authority)
     message = test1.send_message("Hello", test2.user_name) # can't have two people with the same user name
     print(test2.decrypt_message(message, test1.user_name))
+    mess2 = test1.send_message("take 2", test2.user_name)
+    print(test2.decrypt_message(mess2, test1.user_name))
