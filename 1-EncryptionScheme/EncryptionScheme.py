@@ -82,20 +82,15 @@ class EncryptionScheme():
     #  2) HMAC using DH key
     #  3) RSA signature
     def send_message(self, message, receiver):
-        message_and_seq = message + self.get_sequence_num()
+        message_and_seq = message + self.get_sequence_num() # addtion of fixed length seq number 
         encoded_message = message_and_seq.encode('utf8')
-        pub_key = self.cert_authority.dh_request_handler(receiver)
+        pub_key = self.cert_authority.dh_request_handler(receiver) # certificate public key
         key = self.DH(pub_key)
-        cipher_text = self.encrypt_message(encoded_message, receiver)
-        mac = self.authentication_code(key, cipher_text)
+        cipher_text = self.encrypt_message(encoded_message, receiver) # AES encryption
+        mac = self.authentication_code(key, cipher_text) 
         privkey = self.__cert_private_key
         signature = rsa.encrypt(cipher_text, privkey)
-        # print(len(cipher_text))
-        # print(len(mac))
-        # print(len(signature))
-        # print(signature)
-        final_packet = cipher_text + mac + signature
-        # print(len(final_packet))
+        final_packet = (cipher_text, mac, signature) # final message is tuple of three pieces
         return final_packet
 
     # check that ciphertext contains the proper signature and offset bytes
@@ -117,12 +112,11 @@ class EncryptionScheme():
     #  3) sender's public key
     #  4) sequence number (to prevent replays)
     def decrypt_message(self, input_message, sender):
-        message_cipher = input_message[0:64]
-        mac = input_message[64: 64 + 128]
-        signature = input_message[64 + 128:]
-        # print(signature)
+        message_cipher = input_message[0]
+        mac = input_message[1]
+        signature = input_message[2]
         sender_cert_pub_key = self.cert_authority.cert_request_handler(sender)
-        if sender_cert_pub_key is None:
+        if sender_cert_pub_key is None: # looks for certificate public key
             print("no cert exists")
             return None
         mac_status = self.verify_mac(message_cipher, sender, mac)
@@ -134,7 +128,6 @@ class EncryptionScheme():
             print("Sender verification fail")
             return None
         message_and_seq = self.decrypt_data(message_cipher, sender)
-        # print(message_and_seq)
         if self.check_seq(sender, message_and_seq[-5:]) == False:
             print("replay attack detected")
             return None
@@ -144,10 +137,9 @@ class EncryptionScheme():
     # check that message is a replay by sequence number
     #  add current sequence num if msg is safe
     def check_seq(self, sender, seq_num):
-        # print(seq_num)
         int_version = int(seq_num)
         if sender not in self.sequence_num_dict.keys():
-            self.sequence_num_dict[sender] = {int_version}
+            self.sequence_num_dict[sender] = {int_version} #maps sender to set of numbers
         else:
             if int_version in self.sequence_num_dict[sender]:
                 return False
@@ -165,12 +157,10 @@ if __name__ == "__main__":
     test3 = EncryptionScheme("Tim", cert_authority)
 
     # handle sending and verifying/returning messages
-    message = test1.send_message("Hello", test2.user_name) # can't have two people with the same user name
+    message = test1.send_message("really long message test", test2.user_name) # can't have two people with the same user name
     print(test2.decrypt_message(message, test1.user_name),end="\n")
     mess2 = test1.send_message("take 2", test2.user_name)
     print(test2.decrypt_message(mess2, test1.user_name),end="\n")
-    m3 = test1.send_message("len test", test2.user_name)
-    #m4 = test1.send_message("receiver nh", test3.user_name)
+    m3 = test1.send_message("len test"*19, test2.user_name) # 373 byte limit of messge due to rsa.encrypt() -- 152 character limit when using seqNum
     print(test2.decrypt_message(m3, test1.user_name),end="\n")
-    # message 4 fails to decrypt, limit of 10 character message
-    #print(test3.decrypt_message(m4, test1.user_name),end="\n")
+
