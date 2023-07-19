@@ -42,6 +42,7 @@ y = []
 
 directory_benign = '/home/future-leader/Lecture/week_3/train/benignware'
 directory_malware = '/home/future-leader/Lecture/week_3/train/malware'
+
 def parse_data():
     num = 0
     for filename in os.listdir(directory_benign):
