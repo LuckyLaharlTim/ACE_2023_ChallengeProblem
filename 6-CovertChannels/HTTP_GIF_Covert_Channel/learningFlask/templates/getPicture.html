@@ -1,0 +1,18 @@
+{% block content %}
+<form action="#" method="get">
+	<title> Picture of The Day </title>
+        <h3>Today's Picture:</h3>
+	<a href="{{img}}" download="files/{{img}}">
+		<img src={{img}} alt="{{nm}}'s Image" class="image"/>
+	</a>
+	<p>Sent by: {{nm}}</p>
+</form>
+
+<form action="#" method="post" enctype="multipart/form-data">
+	<h3>Download Picture?</h3>
+	<p><input type="button" name="pressed" /></p> //started adding button, look up input type
+	<p>Picture to upload:</p>
+        <p><input type="file" name="img" accept=".png,.jpg,.jpeg,.svg,.gif" /></p>
+	<p><input type="submit" value="Submit & Upload"></p>
+</form>
+{% endblock %}

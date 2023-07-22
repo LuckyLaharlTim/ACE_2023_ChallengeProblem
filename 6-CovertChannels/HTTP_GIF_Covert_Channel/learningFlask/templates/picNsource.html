@@ -1,0 +1,17 @@
+{% block content %}
+<form action="#" method="get">
+	<title> Picture of The Day </title>
+        <h3>Today's Picture:</h3>
+	<img src="{{url_for('files',filename="PicofTheDay.jpg")}}" class="image"/>
+</form>
+
+<form action="button_click" method="post" enctype='multipart/form-data'>
+	<input type="submit" name="btn" value="Download Picture of the Day">
+	<h3>New Picture Submission</h3>
+	<p>Name:</p>
+	<p><input type="text" name="nm" /></p>
+	<p>Picture to upload:</p>
+        <p><input type="file" name="img" accept=".png,.jpg,.jpeg,.svg,.gif" /></p>
+	<p><input type="submit" name="upload" value="Submit & Upload"></p>
+</form>
+{% endblock %}
