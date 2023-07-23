@@ -5,7 +5,7 @@ from post_test import *
 
 
 def input_stego(message, im):
-    bin_message = ''.join(format(ord(x), 'b') for x in message)
+    bin_message = ''.join(format(ord(x), 'b').zfill(7) for x in message)
     str_len = len(bin_message)
     num = bin(str_len)[2:]
     final_len = (20 - len(num))*"0" + num
