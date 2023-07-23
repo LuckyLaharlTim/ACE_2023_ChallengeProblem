@@ -37,6 +37,6 @@ def base():
 if __name__ == "__main__":
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
-    app.run(host="192.168.12.61",port=5000,debug = True)
+    app.run(host="192.168.0.212",port=5000,debug = True)
     
     
