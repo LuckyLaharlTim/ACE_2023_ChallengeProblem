@@ -16,7 +16,7 @@ Running the Submission
 =======================
 * Before attempting to run anything, the user should note the ip of the machine used to run server.py
 * The host parameter to app.run() in server.py should be changed to that ip-address
-* The flask python library should also be installed using "pip install flask" as needed
+  
 	=======================
 	Steps
 	=======================
