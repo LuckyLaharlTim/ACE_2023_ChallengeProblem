@@ -46,6 +46,7 @@ def replace_spaces(text):
 
 ip_address = input("enter ip address of server: ")
 port = input("enter port of server: ")
+picToDecrypt = "PicofTheDay.png"
 options = input("type 1 to encrypt a png file, 2 to decrypt a png file: ")
 
 if int(options) == 1:
@@ -54,21 +55,25 @@ if int(options) == 1:
     one_frame = (len(np.array(image_object).flatten()) - 20)/7
     frame_int = int(math.floor(one_frame))
     new_message = replace_spaces(input("Type your message: "))
+    ## testing message max input
+    # new_message = replace_spaces("Whether the object be to crush an army, to storm a city, or to assassinate an individual, it is always necessary to begin by finding out the names of the attendants, the aides-de-camp, and door-keepers and sentries of the general in command. Our spies must be commissioned to ascertain these.")
+    # new_message = new_message
     num_frames = math.ceil(len(new_message)/one_frame)
 
     if len(new_message) > one_frame:
-        print("too long, must be lesis than {} characters based on the file", one_frame)
+        print(f"too long, must be {frame_int} characters or less based on the file.")
+        print("File not saved. Please try again.")
     else:
         new_image_object = input_stego(new_message, image_object)
-    name = "encrypted_" + png_name 
-    new_image_object.save(name)
-    server_post(name, ip_address, port)
-    print("File saved as " + name)
+        name = "encrypted_" + png_name 
+        new_image_object.save(name)
+        server_post(name, ip_address, port)
+        print("File saved as " + name)
 
     
 if int(options) == 2:
     server_get(ip_address, port)
-    server_response = Image.open("PicofTheDay.png")
+    server_response = Image.open(picToDecrypt)
     final = ""
     message_piece = decrypt_stego(server_response)
     final += message_piece
