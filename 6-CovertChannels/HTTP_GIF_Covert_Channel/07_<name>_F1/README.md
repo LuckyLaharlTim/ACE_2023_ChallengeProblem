@@ -28,6 +28,8 @@ Running the Submission
        IV. run stego.py
        V. respond to the prompts (using 1 as to steg and send an image).
 		- Note that any spaces in you oiginal message will be replaced by underscores
+  		- When you see <Response [200]> you know the image has been successfully uploaded
+  		- This may take a few seconds depending on size of image
        VI. Run stego.py again (2 to download and perform steganalysis on the server's current image)
        VII. The output should result in the same message typed in response to step IV's message prompt.
 
